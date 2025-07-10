@@ -1,0 +1,1 @@
+Built an IoT-based smart plant monitoring and irrigation system using ESP32, integrating sensors to monitor environmental conditions. Built a responsive mobile app using React Native with MQTT for real-time data tracking, plantspecific alerts, automated watering via a relay-controlled pump and speaker output for notifications and media.

@@ -1,29 +1,88 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import styles from './HomeScreenStyles';
+import { Client } from 'paho-mqtt';
 
 const HomeScreen = ({ navigation }) => {
   const [menuVisible, setMenuVisible] = useState(false);
+  // 6 states for each sensor
+  const [temperature, setTemperature] = useState('');
+  const [humidity, setHumidity] = useState('');
+  const [moisture, setMoisture] = useState('');
+  const [light, setLight] = useState('');
+  const [airQuality, setAirQuality] = useState('');
+  const [waterLevel, setWaterLevel] = useState('');
 
-  // Hardcoded sensor data
-  const [temperature, setTemperature] = useState('25°C');
-  const [humidity, setHumidity] = useState('60%');
-  const [moisture, setMoisture] = useState('45%');
-  const [light, setLight] = useState('Medium');
-  const [airQuality, setAirQuality] = useState('Good');
-  const [waterLevel, setWaterLevel] = useState('Optimal');
+  useEffect(() => {
+    const client = new Client(
+      '//MQTT SERVER ID',
+      'webclient_' + Math.random().toString(16).substr(2, 8)
+    );
+
+    client.connect({
+      userName: '//MQTT USERNAME ',
+      password: '//MQTT PASSWORD ', //I used HiveMQ for hosting MQTT server
+      onSuccess: () => {
+        console.log('✅ Connected to MQTT');
+        // Subscribe to all topics
+        client.subscribe('plant/temperature');
+        client.subscribe('plant/humidity');
+        client.subscribe('plant/moisture');
+        client.subscribe('plant/light');
+        client.subscribe('plant/air');
+        client.subscribe('plant/water');
+      },
+      onFailure: (err) => {
+        console.error('❌ Connection failed:', err);
+      }
+    });
+
+    client.onMessageArrived = (message) => {
+      const topic = message.destinationName;
+      const value = message.payloadString;
+
+      switch (topic) {
+        case 'plant/temperature':
+          setTemperature(`${value}°C`);
+          break;
+        case 'plant/humidity':
+          setHumidity(`${value}%`);
+          break;
+        case 'plant/moisture':
+          setMoisture(`${value}%`);
+          break;
+        case 'plant/light':
+          setLight(value); // assume it’s like "Low", "Medium", "High"
+          break;
+        case 'plant/air':
+          setAirQuality(value); // assume something like "Good", "Poor"
+          break;
+        case 'plant/water':
+          setWaterLevel(value); // e.g. "Optimal", "Low"
+          break;
+        default:
+          break;
+      }
+    };
+
+    return () => {
+      if (client.isConnected()) {
+        client.disconnect();
+      }
+    };
+  }, []);
 
   const plantConditions = [
-    { name: 'Moisture', value: moisture, status: 'good', icon: 'water-outline' },
-    { name: 'Temperature', value: temperature, status: 'good', icon: 'thermometer-outline' },
-    { name: 'Humidity', value: humidity, status: 'warning', icon: 'water' },
-    { name: 'Light', value: light, status: 'good', icon: 'sunny-outline' },
-    { name: 'Air Quality', value: airQuality, status: 'good', icon: 'cloud-outline' },
-    { name: 'Water Level', value: waterLevel, status: 'good', icon: 'flask-outline' },
+    { name: 'Moisture', value: moisture || 'Loading...', status: 'good', icon: 'water-outline' },
+    { name: 'Temperature', value: temperature || 'Loading...', status: 'good', icon: 'thermometer-outline' },
+    { name: 'Humidity', value: humidity || 'Loading...', status: 'warning', icon: 'water' },
+    { name: 'Light', value: light || 'Loading...', status: 'good', icon: 'sunny-outline' },
+    { name: 'Air Quality', value: airQuality || 'Loading...', status: 'good', icon: 'cloud-outline' },
+    { name: 'Water Level', value: waterLevel || 'Loading...', status: 'good', icon: 'flask-outline' },
   ];
-
+  
   // Sample data for alerts
   const alerts = [
     { plant: 'Rose', message: 'Water needed', icon: 'water-outline', severity: 'high', image: require('./plant2.jpg') },

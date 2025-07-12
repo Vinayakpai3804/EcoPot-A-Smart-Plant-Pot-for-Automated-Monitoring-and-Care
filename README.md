@@ -16,7 +16,25 @@ It features automated monitoring, AI-based plant recognition and disease diagnos
 - 📚 **Care Library** — Access general tips for maintaining plant health
 - 🤖 **AI Disease Finder** — Upload a photo and chat with AI (via **Groq API**) for diagnosis
 - 💾 **Cloud Storage** — User and plant data synced in real-time via **Firebase Realtime Database**
+- 💧 **Auto Irrigation** — Automatic **water pump** activates when moisture is low
+- 📢 **Audio Alerts** — Speaker output for critical care reminders
+- 🖥️ **Display Module** — Live vitals shown on a digital screen
 - ⚙️ **Settings Page** — Customize app preferences
+
+---
+
+## 🔧 Hardware Setup
+
+### 🛠️ Working prototype 
+<img src="images/hardware.jpg" width="400"/>
+
+**Hardware Components:**
+- ESP32 microcontroller
+- Environmental sensors (moisture, temperature, humidity, etc.)
+- Relay-controlled **water pump**
+- **Display module** to show plant health stats
+- **Speaker** for audio notifications
+- Power module and connections
 
 ---
 
@@ -52,7 +70,7 @@ It features automated monitoring, AI-based plant recognition and disease diagnos
 
 | Layer         | Technology & Tools                           |
 |---------------|-----------------------------------------------|
-| **Hardware**  | ESP32 + environmental sensors                |
+| **Hardware**  | ESP32 + environmental sensors + water pump + display + speaker |
 | **Data Comm.**| MQTT for real-time data transfer             |
 | **Backend**   | Firebase Realtime Database                   |
 | **AI APIs**   | [Plant.id API](https://web.plant.id/), [Groq API](https://groq.com) |
